@@ -1,31 +1,27 @@
-
-const asyncHandler=()=>{()=>{
-    
-
-}}
-
-export {asyncHandler};
+const asyncHandler = (requestHandler) => {
+    return (req, res, next) => {
+        Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err))
+    }
+}
 
 
-
+export { asyncHandler }
 
 
 
 
+// const asyncHandler = () => {}
+// const asyncHandler = (func) => () => {}
+// const asyncHandler = (func) => async () => {}
 
-//wrapper higher order function using async &await
-// const asyncHandler=(fn)=>{async (req,res,next)=>{
+
+// const asyncHandler = (fn) => async (req, res, next) => {
 //     try {
-//         await fn(req,res,next)
-
-        
-        
+//         await fn(req, res, next)
 //     } catch (error) {
-//         res.status(err.code||500).json({
-//             success:false,
-//             message:message.err
+//         res.status(err.code || 500).json({
+//             success: false,
+//             message: err.message
 //         })
-        
 //     }
-
-// }}
+// }
