@@ -5,9 +5,9 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 
 
-const generateAcessAndRefreshTokens= async()=>{
+const generateAcessAndRefreshTokens= async(userId)=>{
     try {
-        await User.findById(userId)
+      const user=  await User.findById(userId)
         const accessToken=user.generateAccessToken()
         const refreshToken=user.generateRefreshToken()
         user.refreshToken=refreshToken
@@ -83,7 +83,7 @@ const registerUser=asyncHandler( async(req,res)=>{
 const loginUser=asyncHandler(async (req,res)=>{
 
     const {email,username,password}=req.body
-    if (!username||!email) {
+    if (!(username||email)) {
         throw new ApiError(400,"username or email is required")
         
     }
@@ -95,7 +95,7 @@ const loginUser=asyncHandler(async (req,res)=>{
         throw new ApiError(404,"User doesnt exist")
         
     }
-    const isPasswordValid=user.isPassword(password)
+    const isPasswordValid=user.isPasswordCorrect(password)
 
     if (!isPasswordValid) {
         throw new ApiError(401,"Password is incorrect")
@@ -103,7 +103,7 @@ const loginUser=asyncHandler(async (req,res)=>{
         
     }
    const {accessToken,refreshToken}= await generateAcessAndRefreshTokens(user._id)
-   const loggedInUser=await User.findById(_id).select("-password -refreshToken")
+   const loggedInUser=await User.findById(user._id).select("-password -refreshToken")
 
 
    const options={
@@ -114,8 +114,8 @@ const loginUser=asyncHandler(async (req,res)=>{
 
    return  res.
    status(200)
-   .cookie("access token",accessToken,options)
-   .cookie("refresh token",refreshToken,options)
+   .cookie("accessToken",accessToken,options)
+   .cookie("refreshToken",refreshToken,options)
    .json(
     new ApiResponse(200,{
         user:loggedInUser,accessToken,refreshToken
@@ -129,12 +129,12 @@ const logoutUser=asyncHandler(async(req,res)=>{
     User.findByIdAndUpdate(
         req.user_id,
         {
-            $set:{
-                refreshToken:undefined
-            },
+            $unset: {
+                refreshToken: 1 // this removes the field from document
+            }
             
         },
-        {set:true}
+        {new:true}
     )
 
 const options={
