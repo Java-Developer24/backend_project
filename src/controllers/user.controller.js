@@ -239,7 +239,7 @@ if (!avatar.url) {
     
     
 }
-          const user=   User.findByIdAndUpdate(req.user?._id,
+          const user=   await User.findByIdAndUpdate(req.user?._id,
                     {
                         $set:{
                             avatar:avatar.url
@@ -265,7 +265,7 @@ if (!coverImage.url) {
     
 }
 
-const user=User.findByIdAndUpdate(req.user?._id,
+const user=await User.findByIdAndUpdate(req.user?._id,
     {
         $set:{
             coverImage:coverImage.url
@@ -284,6 +284,7 @@ export {registerUser,
     changeCurrentPassword,
     getCurrentUser,
     updateAccountDetails,
-    updateUserAvator
+    updateUserAvator,
+    updateUserCoverImage
 
 }
